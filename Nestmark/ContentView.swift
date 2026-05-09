@@ -11,38 +11,51 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
+    @State private var newTaskTitle = ""
 
     var body: some View {
-        NavigationSplitView {
+        NavigationStack {
             List {
                 ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
+                    TaskRow(item: item)
                 }
                 .onDelete(perform: deleteItems)
             }
+            .navigationTitle("Nestmark")
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     EditButton()
                 }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+            }
+            .overlay {
+                if items.isEmpty {
+                    ContentUnavailableView("No Tasks", systemImage: "checklist")
                 }
             }
-        } detail: {
-            Text("Select an item")
+            .safeAreaInset(edge: .bottom) {
+                HStack {
+                    TextField("New task", text: $newTaskTitle)
+                        .textFieldStyle(.roundedBorder)
+                        .onSubmit(addItem)
+
+                    Button("Add", systemImage: "plus.circle.fill", action: addItem)
+                        .labelStyle(.iconOnly)
+                        .font(.title2)
+                        .disabled(newTaskTitle.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+                .padding()
+                .background(.bar)
+            }
         }
     }
 
     private func addItem() {
+        let trimmed = newTaskTitle.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return }
         withAnimation {
-            let newItem = Item(timestamp: Date())
+            let newItem = Item(title: trimmed)
             modelContext.insert(newItem)
+            newTaskTitle = ""
         }
     }
 
