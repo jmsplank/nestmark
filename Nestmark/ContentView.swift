@@ -10,38 +10,43 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-    @State private var newTaskTitle = ""
+    @Query(sort: \Checklist.timestamp, order: .reverse) private var checklists: [Checklist]
+    @State private var newChecklistTitle = ""
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach(items) { item in
-                    TaskRow(item: item)
+                ForEach(checklists) { checklist in
+                    NavigationLink(value: checklist) {
+                        ChecklistRow(checklist: checklist)
+                    }
                 }
-                .onDelete(perform: deleteItems)
+                .onDelete(perform: deleteChecklists)
             }
             .navigationTitle("Nestmark")
+            .navigationDestination(for: Checklist.self) { checklist in
+                ChecklistDetailView(checklist: checklist)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     EditButton()
                 }
             }
             .overlay {
-                if items.isEmpty {
-                    ContentUnavailableView("No Tasks", systemImage: "checklist")
+                if checklists.isEmpty {
+                    ContentUnavailableView("No Checklists", systemImage: "list.bullet.clipboard")
                 }
             }
             .safeAreaInset(edge: .bottom) {
                 HStack {
-                    TextField("New task", text: $newTaskTitle)
+                    TextField("New checklist", text: $newChecklistTitle)
                         .textFieldStyle(.roundedBorder)
-                        .onSubmit(addItem)
+                        .onSubmit(addChecklist)
 
-                    Button("Add", systemImage: "plus.circle.fill", action: addItem)
+                    Button("Add", systemImage: "plus.circle.fill", action: addChecklist)
                         .labelStyle(.iconOnly)
                         .font(.title2)
-                        .disabled(newTaskTitle.trimmingCharacters(in: .whitespaces).isEmpty)
+                        .disabled(newChecklistTitle.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
                 .padding()
                 .background(.bar)
@@ -49,20 +54,20 @@ struct ContentView: View {
         }
     }
 
-    private func addItem() {
-        let trimmed = newTaskTitle.trimmingCharacters(in: .whitespaces)
+    private func addChecklist() {
+        let trimmed = newChecklistTitle.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
         withAnimation {
-            let newItem = Item(title: trimmed)
-            modelContext.insert(newItem)
-            newTaskTitle = ""
+            let checklist = Checklist(title: trimmed)
+            modelContext.insert(checklist)
+            newChecklistTitle = ""
         }
     }
 
-    private func deleteItems(offsets: IndexSet) {
+    private func deleteChecklists(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(items[index])
+                modelContext.delete(checklists[index])
             }
         }
     }
@@ -70,5 +75,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: Checklist.self, inMemory: true)
 }
