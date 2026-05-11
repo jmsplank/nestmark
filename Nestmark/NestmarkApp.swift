@@ -13,7 +13,9 @@ struct NestmarkApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
-            Checklist.self
+            Checklist.self,
+            ChecklistSession.self,
+            SessionItem.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
