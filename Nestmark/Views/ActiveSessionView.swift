@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct ActiveSessionView: View {
-    var session: ChecklistSession
+    var session: SessionChecklist
 
     var body: some View {
         List {
             ForEach(session.sortedSessionItems) { item in
-                SessionItemRow(sessionItem: item)
+                SessionEntryRow(sessionItem: item)
             }
         }
         .navigationTitle(session.checklist?.title ?? "Session")
