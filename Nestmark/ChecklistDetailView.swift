@@ -13,14 +13,10 @@ struct ChecklistDetailView: View {
     @Bindable var checklist: Checklist
     @State private var newTaskTitle = ""
 
-    private var sortedItems: [Item] {
-        (checklist.items ?? []).sorted { $0.timestamp < $1.timestamp }
-    }
-
     var body: some View {
         List {
-            ForEach(sortedItems) { item in
-                TaskRow(item: item)
+            ForEach(checklist.sortedItems) { item in
+                ItemRow(item: item)
             }
             .onDelete(perform: deleteItems)
         }
@@ -31,7 +27,7 @@ struct ChecklistDetailView: View {
             }
         }
         .overlay {
-            if sortedItems.isEmpty {
+            if (checklist.items ?? []).isEmpty {
                 ContentUnavailableView("No Tasks", systemImage: "checklist")
             }
         }
@@ -64,7 +60,7 @@ struct ChecklistDetailView: View {
 
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-            let items = sortedItems
+            let items = checklist.sortedItems
             for index in offsets {
                 modelContext.delete(items[index])
             }
