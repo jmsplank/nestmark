@@ -12,17 +12,17 @@ import SwiftData
 struct NestmarkApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
             Checklist.self,
-            ChecklistSession.self,
-            SessionItem.self
+            ChecklistEntry.self,
+            SessionChecklist.self,
+            SessionEntry.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
             return try ModelContainer(
                 for: schema,
-                migrationPlan: ItemMigrationPlan.self,
+                migrationPlan: MigrationPlan.self,
                 configurations: [modelConfiguration]
             )
         } catch {

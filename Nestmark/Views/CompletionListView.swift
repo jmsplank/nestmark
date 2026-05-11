@@ -10,7 +10,7 @@ import SwiftData
 
 struct CompletionListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \ChecklistSession.timestamp, order: .reverse) private var sessions: [ChecklistSession]
+    @Query(sort: \SessionChecklist.startedAt, order: .reverse) private var sessions: [SessionChecklist]
     @Query(sort: \Checklist.timestamp, order: .reverse) private var checklists: [Checklist]
     @State private var path = NavigationPath()
     @State private var showingChecklistPicker = false
@@ -20,13 +20,13 @@ struct CompletionListView: View {
             List {
                 ForEach(sessions) { session in
                     NavigationLink(value: session) {
-                        SessionRow(session: session, showChecklistTitle: true)
+                        SessionChecklistRow(session: session, showChecklistTitle: true)
                     }
                 }
                 .onDelete(perform: deleteSessions)
             }
             .navigationTitle("Complete")
-            .navigationDestination(for: ChecklistSession.self) { session in
+            .navigationDestination(for: SessionChecklist.self) { session in
                 ActiveSessionView(session: session)
             }
             .toolbar {
