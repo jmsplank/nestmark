@@ -33,11 +33,11 @@ final class ChecklistEntry {
 
     var kind: Kind { item != nil ? .item : .checklist }
     enum Kind { case item, checklist }
-    
-    func createSession(in session: SessionChecklist) -> SessionEntry {
+
+    func createSession(in session: SessionChecklist, context: ModelContext) -> SessionEntry {
         let entry = SessionEntry(position: position, session: session)
-        entry.title = item?.title
-        entry.childChecklist = childChecklist?.createSession()
+        entry.title = item?.title ?? ""
+        entry.childChecklist = childChecklist?.createSession(in: context)
         return entry
     }
 }

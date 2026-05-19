@@ -8,9 +8,13 @@
 import SwiftUI
 import SwiftData
 
-struct CompletionListView: View {
+struct SessionListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \SessionChecklist.startedAt, order: .reverse) private var sessions: [SessionChecklist]
+    @Query(
+        filter: #Predicate<SessionChecklist> { $0.parentEntry == nil },
+        sort: \SessionChecklist.startedAt,
+        order: .reverse
+    ) private var sessions: [SessionChecklist]
     @Query(sort: \Checklist.timestamp, order: .reverse) private var checklists: [Checklist]
     @State private var path = NavigationPath()
     @State private var showingChecklistPicker = false
@@ -22,8 +26,21 @@ struct CompletionListView: View {
                     NavigationLink(value: session) {
                         SessionChecklistRow(session: session, showChecklistTitle: true)
                     }
+                    .swipeActions(edge: .trailing) {
+                        Button("Delete", role: .destructive) {
+                            withAnimation {
+                                modelContext.delete(session)
+                            }
+                        }
+                    }
+
+                    ForEach(session.childSessions) { child in
+                        NavigationLink(value: child) {
+                            SessionChecklistRow(session: child, showChecklistTitle: true)
+                        }
+                        .padding(.leading)
+                    }
                 }
-                .onDelete(perform: deleteSessions)
             }
             .navigationTitle("Complete")
             .navigationDestination(for: SessionChecklist.self) { session in
@@ -75,17 +92,9 @@ struct CompletionListView: View {
         showingChecklistPicker = false
         path.append(session)
     }
-
-    private func deleteSessions(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(sessions[index])
-            }
-        }
-    }
 }
 
 #Preview {
-    CompletionListView()
+    SessionListView()
         .modelContainer(for: Checklist.self, inMemory: true)
 }

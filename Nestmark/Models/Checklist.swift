@@ -20,11 +20,11 @@ final class Checklist {
         self.title = title
         self.timestamp = timestamp
     }
-    
+
     func createSession(in context: ModelContext) -> SessionChecklist {
         let session = SessionChecklist(title: title, template: self)
         let sorted = entries.sorted { $0.position < $1.position }
-        session.entries = sorted.map { $0.createSession(in: session) }
+        session.entries = sorted.map { $0.createSession(in: session, context: context) }
         context.insert(session)
         return session
     }
