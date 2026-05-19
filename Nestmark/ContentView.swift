@@ -12,7 +12,7 @@ struct ContentView: View {
     var body: some View {
         TabView {
             Tab("Complete", systemImage: "checkmark.circle") {
-                CompletionListView()
+                SessionListView()
             }
 
             Tab("Checklists", systemImage: "square.and.pencil") {

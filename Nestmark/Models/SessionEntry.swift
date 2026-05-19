@@ -20,7 +20,7 @@ final class SessionEntry {
     var title: String = ""
 
     // Nested run for sublist entries
-    @Relationship(deleteRule: .cascade)
+    @Relationship(deleteRule: .cascade, inverse: \SessionChecklist.parentEntry)
     var childChecklist: SessionChecklist?
 
     init(position: Int, session: SessionChecklist? = nil) {

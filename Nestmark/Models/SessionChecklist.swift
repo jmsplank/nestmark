@@ -13,8 +13,9 @@ final class SessionChecklist {
     var title: String = ""
     var startedAt: Date = Date.now
     var completedAt: Date?
-    
+
     var template: Checklist?
+    var parentEntry: SessionEntry?
 
     @Relationship(deleteRule: .cascade, inverse: \SessionEntry.session)
     var entries: [SessionEntry]? = []

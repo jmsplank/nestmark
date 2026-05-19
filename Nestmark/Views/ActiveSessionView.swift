@@ -12,14 +12,23 @@ struct ActiveSessionView: View {
 
     var body: some View {
         List {
-            ForEach(session.sortedSessionItems) { item in
-                SessionEntryRow(sessionItem: item)
+            ForEach(session.sortedEntries) { entry in
+                switch entry.kind {
+                case .item:
+                    SessionEntryRow(sessionEntry: entry)
+                case .checklist:
+                    if let child = entry.childChecklist {
+                        NavigationLink(value: child) {
+                            Label(child.title, systemImage: "list.bullet")
+                        }
+                    }
+                }
             }
         }
-        .navigationTitle(session.checklist?.title ?? "Session")
+        .navigationTitle(session.title)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Text("\(session.completedCount)/\((session.sessionItems ?? []).count)")
+                Text("\(session.completedCount)/\(session.totalEntries)")
                     .foregroundStyle(.secondary)
             }
         }

@@ -11,7 +11,7 @@ struct ChecklistRow: View {
     var checklist: Checklist
 
     private var itemCount: Int {
-        (checklist.entries ?? []).count
+        checklist.entries.count
     }
 
     var body: some View {
